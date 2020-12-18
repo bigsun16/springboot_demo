@@ -56,3 +56,7 @@ build/
 .vscode/
 /security_springboot/
 /security_springboot/.mvn/
+/demo/.gitignore
+/demo/mvnw
+/demo/mvnw.cmd
+/demo/.mvn/
