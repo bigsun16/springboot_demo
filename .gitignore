@@ -42,7 +42,7 @@ target/
 *.iws
 *.iml
 *.ipr
-
+*.mvn
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -55,3 +55,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/security_springboot/
+/security_springboot/.mvn/
