@@ -4,6 +4,7 @@ import com.qihui.sun.springboot_webclient.vo.RemoteBasicInfoProperties;
 import com.qihui.sun.springboot_webclient.vo.StudentProperties;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import java.io.*;
 import java.util.Map;
 
 @RestController
@@ -42,12 +44,30 @@ public class HelloWorldController implements InitializingBean {
         this.remoteBasicInfoProperties = remoteBasicInfoProperties;
     }
 
-    @RequestMapping("/hello")
+    @GetMapping("/hello")
+    @ApiOperation("test springboot hello world")
     public String helloWorld() {
         return studentProperties.getName()+"::"+studentProperties.getAge();
     }
 
-    @RequestMapping("/testWebClient2")
+    @GetMapping("/testWebClient")
+    @ApiOperation("query all malfunctionDefinition from 61")
+    public Map testWebClient(){
+        login();
+        Mono<ResponseEntity<Map>> responseEntityMono = WEBCLIENT
+                .get()
+                .uri("/ssc-device-manager/rest/malfunctionDefinition/allData/malfunctionName")
+                .header(HttpHeaders.COOKIE,COOKIE)
+                .retrieve()
+                .toEntity(Map.class);
+        Map body = responseEntityMono.block().getBody();
+        logout();
+        return body;
+    }
+
+
+    @GetMapping("/testWebClient2")
+    @ApiOperation("query all malfunctionDefinition from 61")
     public Map testWebClient2(){
         login();
         Mono<ResponseEntity<Map>> responseEntityMono = WEBCLIENT
@@ -61,7 +81,8 @@ public class HelloWorldController implements InitializingBean {
         return body;
     }
 
-    @RequestMapping("/testWebClient3")
+    @GetMapping("/testWebClient3")
+    @ApiOperation("query pmCounters from 61")
     public Map testWebClient3(){
         login();
         Mono<ResponseEntity<Map>> responseEntityMono = WEBCLIENT
@@ -80,6 +101,15 @@ public class HelloWorldController implements InitializingBean {
         Map body = responseEntityMono.doOnError(exception->{
             System.out.println("error2==================================");
         }).block().getBody();
+        try {
+            ObjectOutputStream ous = new ObjectOutputStream(new FileOutputStream("C:\\qihuis\\seriObj.txt"));
+            ous.writeObject(body);
+            ous.close();
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("C:\\qihuis\\seriObj.txt"));
+            body = (Map) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         logout();
         return body;
     }
@@ -90,8 +120,8 @@ public class HelloWorldController implements InitializingBean {
         parms.add("j_password", remoteBasicInfoProperties.getPassword());
         Mono<ResponseEntity<String>> responseEntityMono1 = WEBCLIENT.post()
                 .uri("/j_security_check")
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(Mono.just(parms),MultiValueMap.class)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .retrieve()
                 .toEntity(String.class);
         ResponseEntity<String> block1 = responseEntityMono1.block();
