@@ -5,6 +5,6 @@ student:
   age: 18
 #content: "name:${name},age:${age}"
 remote:
-  userName: qihuis
-  password: 11111111
-  baseUrl: https://135.252.247.61:8443
+  userName: admin
+  password: 22222222
+  baseUrl: https://135.252.247.12:8443
