@@ -60,3 +60,4 @@ build/
 /demo/mvnw
 /demo/mvnw.cmd
 /demo/.mvn/
+/.gradle/
