@@ -8,3 +8,6 @@ remote:
   userName: qihuis
   password: 11111111
   baseUrl: https://135.252.247.61:8443
+spring:
+  profiles:
+    include: new
