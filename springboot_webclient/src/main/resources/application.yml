@@ -11,3 +11,5 @@ remote:
 spring:
   profiles:
     include: new
+#如果要通过jar包启动并引用外部配置文件可以使用
+#java -jar demo.jar --spring.config.location=application.yml
