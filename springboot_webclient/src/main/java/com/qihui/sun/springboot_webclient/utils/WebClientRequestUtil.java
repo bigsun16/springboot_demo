@@ -5,13 +5,30 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
+import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
+import java.time.Duration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class WebClientRequestUtil {
+
+    public static ParallelFlux<Map> concurrentRequestWithDelay(Function<String, Mono<Map>> function) {
+        Set<String> tokens = new HashSet<>();
+        long delaySeconds = 1l;
+        return Flux.fromStream(tokens.stream())
+                .delayElements(Duration.ofMillis(delaySeconds))
+                .parallel()
+                .runOn(Schedulers.elastic())
+                .flatMap(function);
+    }
+
     public static Object request(String uri, Map<String, Object> queryParams,Object bodyData, HttpMethod httpMethod, String cookie) {
         WebClient.RequestBodyUriSpec requestBodyUriSpec = WebClientConfig.getInstance().method(httpMethod);
         WebClient.RequestHeadersSpec<?> requestHeadersSpec = null;
