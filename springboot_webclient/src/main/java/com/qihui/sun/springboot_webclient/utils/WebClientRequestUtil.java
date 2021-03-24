@@ -17,11 +17,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+/**
+ * @author qihuis
+ */
 public class WebClientRequestUtil {
 
     public static ParallelFlux<Map> concurrentRequestWithDelay(Function<String, Mono<Map>> function) {
         Set<String> tokens = new HashSet<>();
-        long delaySeconds = 1l;
+        long delaySeconds = 1L;
         return Flux.fromStream(tokens.stream())
                 .delayElements(Duration.ofMillis(delaySeconds))
                 .parallel()
@@ -60,6 +63,8 @@ public class WebClientRequestUtil {
                 requestHeadersSpec = requestBodyUriSpec.uri(uriStr)
                         .header(HttpHeaders.COOKIE, cookie)
                         .body(monoValue, String.class);
+                break;
+            default:
                 break;
         }
         assert requestHeadersSpec != null;
